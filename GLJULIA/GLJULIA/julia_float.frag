@@ -2,11 +2,19 @@
 
 #extension GL_ARB_gpu_shader_fp64 : enable
 
-varying vec2 p;
 
 uniform vec2 c;
+
 uniform int max_calc = 500;
+uniform int julia_power = 2;
+
+uniform float color_range = 1.0;
+uniform float color_offset = 0.0;
+
+varying vec2 p;
+
 const float threshold = 2.0;
+const int calc_mod = 200;
 
 vec3 hsv2rgb(vec3 c) {
     vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
@@ -41,13 +49,14 @@ vec2 complex_exp(vec2 a) {
 }
 
 void main() {
-    vec2 z = vec2(p.x, p.y);
+    vec2 z = p.xy;
     int count = -1;
     
     for (int i = 0; i < max_calc; i++) {
-        vec2 nz = vec2(0, 0);
-		nz = (complex_pow(z, 2) + c);
-        if (length(nz) > threshold) {
+        vec2 nz = (complex_pow(z, julia_power) + c);
+        
+		// length(nz)
+		if (dot(nz, nz) > threshold) {
             count = i;
             break;
         }
@@ -57,9 +66,14 @@ void main() {
     if (count == -1) {
         gl_FragColor = vec4(0, 0, 0, 0);
     } else {
-		float brightness = float(mod(count, 100)) / 100.0;
-		//gl_FragColor = vec4(brightness, brightness, brightness, 1.0);
+		float brightness = float(mod(count, calc_mod)) / calc_mod;
+		
+		brightness *= color_range;
+		brightness += color_offset;
+
+		brightness -= floor(brightness);
+
 		vec3 color = hsv2rgb(vec3(brightness, 1.0, 1.0));
-		gl_FragColor = vec4(color.x, color.y, color.z, 1.0);
+		gl_FragColor = vec4(color, 1.0);
     }
 }

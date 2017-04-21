@@ -43,13 +43,14 @@ dvec2 complex_div(dvec2 a, dvec2 b) {
 void main() {
 	dvec2 p = (vp * zoom + center) / aspect_ratio * dvec2(aspect_ratio, 1.0);
 
-    dvec2 z = dvec2(p.x, p.y);
+    dvec2 z = p.xy;
     int count = -1;
     
     for (int i = 0; i < max_calc; i++) {
         dvec2 nz = (complex_pow(z, julia_power) + c);
         
-		if (length(nz) > threshold) {
+		// length(nz)
+		if (dot(nz, nz) > threshold) {
             count = i;
             break;
         }
@@ -67,6 +68,6 @@ void main() {
 		brightness -= floor(brightness);
 
 		vec3 color = hsv2rgb(vec3(brightness, 1.0, 1.0));
-		gl_FragColor = vec4(color.x, color.y, color.z, 1.0);
+		gl_FragColor = vec4(color, 1.0);
     }
 }
