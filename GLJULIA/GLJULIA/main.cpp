@@ -488,12 +488,15 @@ void gamepad_update() {
 
 		if (pad->State.buttons[GamePad_Button_BACK]) {
 			if (!back_down) {
+				/*
 				zoom_value = 7.0;
 				exp_zoom = exp(zoom_value * log(1.1));
 				center_point[0] = 0.0;
 				center_point[1] = 0.0;
 				//c_value[0] = 0.0;
 				//c_value[1] = 0.0;
+				*/
+				float_mode = !float_mode;
 				pad->vibrate(VIBRATE_STRENGTH, VIBRATE_STRENGTH);
 			}
 			back_down = true;
