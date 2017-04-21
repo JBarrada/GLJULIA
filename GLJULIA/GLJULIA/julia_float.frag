@@ -5,16 +5,15 @@
 varying vec2 p;
 
 uniform vec2 c;
-uniform int max_calc = 200;
-
+uniform int max_calc = 500;
 const float threshold = 2.0;
 
-vec3 hsv2rgb(vec3 c)
-{
+vec3 hsv2rgb(vec3 c) {
     vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
     vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
     return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
 }
+
 
 vec2 complex_mult(vec2 a, vec2 b) {
 	return vec2((a.x*b.x) - (a.y*b.y), (a.x*b.y) + (a.y*b.x));
@@ -41,18 +40,12 @@ vec2 complex_exp(vec2 a) {
 	return vec2(ex*cos(a.y), ex*sin(a.y));
 }
 
-void main()
-{
+void main() {
     vec2 z = vec2(p.x, p.y);
     int count = -1;
     
     for (int i = 0; i < max_calc; i++) {
         vec2 nz = vec2(0, 0);
-        /*
-		nz.x = z.x * z.x  - z.y * z.y + c.x;
-        nz.y = 2.0 * z.x * z.y + c.y;
-		*/
-		//nz = (complex_exp(complex_pow(z, 6)) + c);
 		nz = (complex_pow(z, 2) + c);
         if (length(nz) > threshold) {
             count = i;

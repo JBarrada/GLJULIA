@@ -21,9 +21,15 @@
     <ClCompile Include="shader_utils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="gamepad_input.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="shader_utils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gamepad_input.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
