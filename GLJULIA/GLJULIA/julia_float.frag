@@ -1,20 +1,21 @@
 #version 400
 
-#extension GL_ARB_gpu_shader_fp64 : enable
-
-
 uniform vec2 c;
-
+uniform vec2 center;
+uniform float zoom;
+uniform float aspect_ratio;
 uniform int max_calc = 500;
 uniform int julia_power = 2;
 
 uniform float color_range = 1.0;
 uniform float color_offset = 0.0;
 
-varying vec2 p;
+//varying vec2 p;
+varying vec2 vp;
 
 const float threshold = 2.0;
 const int calc_mod = 200;
+
 
 vec3 hsv2rgb(vec3 c) {
     vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
@@ -49,6 +50,7 @@ vec2 complex_exp(vec2 a) {
 }
 
 void main() {
+	vec2 p = (vp * zoom + center) / aspect_ratio * vec2(aspect_ratio, 1.0);
     vec2 z = p.xy;
     int count = -1;
     
@@ -64,10 +66,10 @@ void main() {
     }
     
     if (count == -1) {
-        gl_FragColor = vec4(0, 0, 0, 0);
+        gl_FragColor = vec4(0, 0, 0, 1);
     } else {
 		float brightness = float(mod(count, calc_mod)) / calc_mod;
-		
+
 		brightness *= color_range;
 		brightness += color_offset;
 

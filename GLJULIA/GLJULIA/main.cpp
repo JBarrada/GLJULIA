@@ -23,10 +23,11 @@ int SCREEN_H = 300;
 double SCREEN_W_2 = (SCREEN_W / 2.0);
 double SCREEN_H_2 = (SCREEN_H / 2.0);
 
-bool float_mode = false;
+bool float_mode = true;
 
 double zoom_value = 7;
 double center_point[] = {0.0, 0.0};
+float center_point_float[] = { 0.0, 0.0 };
 
 float c_value[] = { 0.279, 0.0 };
 
@@ -116,7 +117,7 @@ void draw_stick(float x, float y, float stickx, float sticky, float cruisex, flo
 	draw_box(x + stickx_hud - HUD_I_SIZE, y + sticky_hud - HUD_I_SIZE, HUD_I_SIZE, HUD_I_SIZE);
 
 	if (cruise) {
-		glColor4f(r, g, b, 0.5);
+		glColor4f(r, g, b, 0.8);
 		stickx_hud = (cruisex + 1.0) * HUD_SIZE;
 		sticky_hud = (cruisey + 1.0) * HUD_SIZE;
 		draw_box(x + stickx_hud - HUD_I_SIZE, y + sticky_hud - HUD_I_SIZE, HUD_I_SIZE, HUD_I_SIZE);
@@ -133,27 +134,25 @@ void draw_pad() {
 		float rstick_x = expo(pad->State.rstick_x);
 		float rstick_y = expo(pad->State.rstick_y);
 		
-		glColor4f(1, 1, 1, 0.25);
+		float trigger_sum = expo(pad->State.lt - pad->State.rt);
+
+		glColor4f(1, 1, 1, 0.4);
 		draw_stick(HUD_PAD, HUD_PAD, lstick_x, lstick_y, move_cruise_speed_x, move_cruise_speed_y, move_cruise, 0, 1, 0);
 		
-		/*
-		if (rstick_mode == 0) 
-			glColor4f(1, 1, 1, 0.25);
-		else 
-			glColor4f(1, 1, 1, 0.1);
-		*/
-		glColor4f(1,1,1, (rstick_mode == 0)? 0.25 : 0.1);
+		glColor4f(1,1,1, (rstick_mode == 0)? 0.4 : 0.2);
 		draw_stick(HUD_PAD*2 + HUD_SIZE*2, HUD_PAD, rstick_x, rstick_y, c_value_cruise_speed_x, c_value_cruise_speed_y, c_value_cruise, 1, 0, 0);
-		/*
-		if (rstick_mode == 1)
-			glColor4f(1, 1, 1, 0.25);
-		else 
-			glColor4f(1, 1, 1, 0.1);
-		*/
-		glColor4f(1,1,1, (rstick_mode == 1)? 0.25 : 0.1);
+
+		glColor4f(1,1,1, (rstick_mode == 1)? 0.4 : 0.2);
 		draw_stick(HUD_PAD * 3 + HUD_SIZE * 4, HUD_PAD, rstick_x, rstick_y, color_cruise_speed_x, color_cruise_speed_y, color_cruise, 0, 0, 1);
 
-
+		glColor4f(1, 1, 1, 0.4);
+		draw_box(HUD_PAD, HUD_PAD * 2 + HUD_SIZE * 2, HUD_PAD + HUD_SIZE * 3, HUD_I_SIZE);
+		glColor4f(1, 1, 1, 0.5);
+		draw_box(HUD_PAD + (HUD_PAD + HUD_SIZE * 3)*(trigger_sum+1.0) - HUD_I_SIZE, HUD_PAD * 2 + HUD_SIZE * 2, HUD_I_SIZE, HUD_I_SIZE);
+		if (zoom_cruise) {
+			glColor4f(1, 1, 0, 0.8);
+			draw_box(HUD_PAD + (HUD_PAD + HUD_SIZE * 3)*(zoom_cruise_speed + 1.0) - HUD_I_SIZE, HUD_PAD * 2 + HUD_SIZE * 2, HUD_I_SIZE, HUD_I_SIZE);
+		}
 	}
 }
 
@@ -167,31 +166,51 @@ void render() {
 		glUniform2dv(center, 1, center_point);
 		GLint zoom = glGetUniformLocation(program, "zoom");
 		glUniform1d(zoom, exp_zoom);
+
+		GLint c_val = glGetUniformLocation(program, "c");
+		glUniform2fv(c_val, 1, c_value);
+		GLint aspect_ratio = glGetUniformLocation(program, "aspect_ratio");
+		glUniform1f(aspect_ratio, (float)SCREEN_W / (float)SCREEN_H);
+
+		GLint color_offset = glGetUniformLocation(program, "color_offset");
+		glUniform1f(color_offset, color_offset_value);
+		GLint color_range = glGetUniformLocation(program, "color_range");
+		glUniform1f(color_range, color_range_value);
+
+		GLint max_calc = glGetUniformLocation(program, "max_calc");
+		glUniform1i(max_calc, max_calc_value);
+
+		GLint julia_power = glGetUniformLocation(program, "julia_power");
+		glUniform1i(julia_power, julia_power_value);
+
 	} else {
 		glUseProgram(program_float);
 
-		GLint center = glGetUniformLocation(program, "center");
-		float center_point_float[] = {(float)center_point[0], (float)center_point[1]};
+		GLint center = glGetUniformLocation(program_float, "center");
+		center_point_float[0] = center_point[0];
+		center_point_float[1] = center_point[1];
 		glUniform2fv(center, 1, center_point_float);
-		GLint zoom = glGetUniformLocation(program, "zoom");
-		glUniform1d(zoom, (float)exp_zoom);
+
+		GLint zoom = glGetUniformLocation(program_float, "zoom");
+		glUniform1f(zoom, (float)exp_zoom);
+
+		GLint c_val = glGetUniformLocation(program_float, "c");
+		glUniform2fv(c_val, 1, c_value);
+		GLint aspect_ratio = glGetUniformLocation(program_float, "aspect_ratio");
+		glUniform1f(aspect_ratio, (float)SCREEN_W / (float)SCREEN_H);
+
+		GLint color_offset = glGetUniformLocation(program_float, "color_offset");
+		glUniform1f(color_offset, color_offset_value);
+		GLint color_range = glGetUniformLocation(program_float, "color_range");
+		glUniform1f(color_range, color_range_value);
+
+		GLint max_calc = glGetUniformLocation(program_float, "max_calc");
+		glUniform1i(max_calc, max_calc_value);
+
+		GLint julia_power = glGetUniformLocation(program_float, "julia_power");
+		glUniform1i(julia_power, julia_power_value);
 	}
 	
-	GLint c_val = glGetUniformLocation(program, "c");
-	glUniform2fv(c_val, 1, c_value);
-	GLint aspect_ratio = glGetUniformLocation(program, "aspect_ratio");
-	glUniform1f(aspect_ratio, SCREEN_W / (float)SCREEN_H);
-
-	GLint color_offset = glGetUniformLocation(program, "color_offset");
-	glUniform1f(color_offset, color_offset_value);
-	GLint color_range = glGetUniformLocation(program, "color_range");
-	glUniform1f(color_range, color_range_value);
-
-	GLint max_calc = glGetUniformLocation(program, "max_calc");
-	glUniform1i(max_calc, max_calc_value);
-
-	GLint julia_power = glGetUniformLocation(program, "julia_power");
-	glUniform1i(julia_power, julia_power_value);
 
 	glEnableClientState(GL_VERTEX_ARRAY);
 
@@ -239,7 +258,7 @@ void on_click(int button, int state, int x, int y) {
 void on_move(int x, int y) {
 	if (move_drag) {
 		double fx = (x - move_drag_x) / SCREEN_W_2 * exp_zoom;
-		double fy = (y - move_drag_y) / SCREEN_H_2 * exp_zoom);
+		double fy = (y - move_drag_y) / SCREEN_H_2 * exp_zoom;
 
 		move_drag_x = x;
 		move_drag_y = y;
@@ -307,7 +326,7 @@ void gamepad_update() {
 				center_point[1] += (move_cruise_speed_y * 2.0) / SCREEN_H_2 * exp_zoom;
 			}
 			if (!move_cruise && pad->State.buttons[GamePad_Button_A] == true) {
-				if (fabs(pad->State.lstick_x) > 0.02 && fabs(pad->State.lstick_y) > 0.02) {
+				if (fabs(pad->State.lstick_x) > 0.02 || fabs(pad->State.lstick_y) > 0.02) {
 					move_cruise = true;
 					move_cruise_speed_x += lstick_x;
 					move_cruise_speed_y += lstick_y;
@@ -356,7 +375,7 @@ void gamepad_update() {
 				c_value[1] += (c_value_cruise_speed_y / 40.0) / SCREEN_H_2 * exp_zoom;
 			}
 			if (!c_value_cruise && pad->State.buttons[GamePad_Button_B] == true) {
-				if (fabs(pad->State.rstick_x) > 0.02 && fabs(pad->State.rstick_y) > 0.02) {
+				if (fabs(pad->State.rstick_x) > 0.02 || fabs(pad->State.rstick_y) > 0.02) {
 					c_value_cruise = true;
 					c_value_cruise_speed_x += rstick_x;
 					c_value_cruise_speed_y += rstick_y;
@@ -380,7 +399,7 @@ void gamepad_update() {
 				color_range_value += color_cruise_speed_y / 100.0;
 			}
 			if (!color_cruise && pad->State.buttons[GamePad_Button_X] == true) {
-				if (fabs(pad->State.rstick_x) > 0.02 && fabs(pad->State.rstick_y) > 0.02) {
+				if (fabs(pad->State.rstick_x) > 0.02 || fabs(pad->State.rstick_y) > 0.02) {
 					color_cruise = true;
 					color_cruise_speed_x += rstick_x;
 					color_cruise_speed_y += rstick_y;
@@ -419,11 +438,13 @@ void gamepad_update() {
 				if (zoom_cruise_speed != 0.0) exp_zoom = exp(zoom_value * log(1.1));
 			}
 			if (!zoom_cruise && pad->State.buttons[GamePad_Button_Y] == true) {
-				zoom_cruise = true;
-				zoom_cruise_speed += trigger_sum;
-				zoom_lock = true;
+				if (fabs(pad->State.lt) > 0.02 || fabs(pad->State.rt) > 0.02) {
+					zoom_cruise = true;
+					zoom_cruise_speed += trigger_sum;
+					zoom_lock = true;
 
-				pad->vibrate(VIBRATE_STRENGTH, VIBRATE_STRENGTH);
+					pad->vibrate(VIBRATE_STRENGTH, VIBRATE_STRENGTH);
+				}
 			}
 			else if (zoom_cruise && !zoom_lock && pad->State.buttons[GamePad_Button_Y] == true) {
 				zoom_cruise = false;

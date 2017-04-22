@@ -58,7 +58,7 @@ void main() {
     }
     
     if (count == -1) {
-        gl_FragColor = vec4(0, 0, 0, 0);
+        gl_FragColor = vec4(0, 0, 0, 1);
     } else {
 		float brightness = float(mod(count, calc_mod)) / calc_mod;
 		
