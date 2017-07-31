@@ -31,6 +31,7 @@ typedef enum {
 
 struct GamePadState {
 	bool buttons[GamePadButton_Max];
+	bool buttons_last[GamePadButton_Max];
 	
 	float lstick_x;
 	float lstick_y;
@@ -43,7 +44,8 @@ struct GamePadState {
 
 	void reset() {
 		for (int i = 0; i < (int)GamePadButton_Max; ++i) {
-			buttons[i] = false;
+			//buttons[i] = false;
+			//buttons_last[i] = false;
 		}
 		
 		lstick_x = lstick_y = 0.0;

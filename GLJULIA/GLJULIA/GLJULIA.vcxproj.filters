@@ -24,12 +24,42 @@
     <ClCompile Include="gamepad_input.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="julia_gamepad.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="drawing_tools.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="julia_state.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="julia_menu.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="julia_explorer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="shader_utils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="gamepad_input.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="julia_state.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="julia_gamepad.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="drawing_tools.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="julia_menu.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="julia_explorer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

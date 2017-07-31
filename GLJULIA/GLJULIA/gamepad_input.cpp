@@ -30,6 +30,11 @@ void GamePadXbox::update() {
 		State.lt = _controllerState.Gamepad.bLeftTrigger / 255.0;
 	}
 
+	for (int i = 0; i < (int)GamePadButton_Max; ++i) {
+		State.buttons_last[i] = (bool)State.buttons[i];
+		State.buttons[i] = false;
+	}
+
 	if (_controllerState.Gamepad.wButtons & XINPUT_GAMEPAD_START) State.buttons[GamePad_Button_START] = true;
 	if (_controllerState.Gamepad.wButtons & XINPUT_GAMEPAD_BACK) State.buttons[GamePad_Button_BACK] = true;
 
